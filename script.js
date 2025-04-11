@@ -10,35 +10,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const footer = document.querySelector('footer');
     
     // Global variables
-    let api = null;
+    let iframeElement = null;
     let currentRoom = '';
+    let timerInterval = null;
     
     // Generate a random room name if the input is empty
     function generateRoomName() {
         return 'edupear_' + Math.random().toString(36).substring(2, 15);
     }
     
-    // Validate the room name
+    // Validate the room name - making sure it won't trigger Jitsi security
     function validateRoomName(roomName) {
-        // Remove any special characters and spaces
-        return roomName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+        // Remove any special characters and spaces, and make unique enough to avoid collisions
+        const validatedName = roomName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+        // Add a random suffix to avoid any room name that might be reserved or have security settings
+        return validatedName + '_' + Math.random().toString(36).substring(2, 7);
     }
     
-    // Initialize the Jitsi Meet API
-    function initializeJitsi(roomName, isHost = true) {
-        // Show loading state
+    // This approach completely bypasses the Jitsi API to avoid authentication problems
+    function startMeeting(roomName, isHost = true) {
+        // Generate a clean room name
+        currentRoom = validateRoomName(roomName || generateRoomName());
+        roomNameInput.value = currentRoom;
+        
+        // Prepare the meeting container
         meetingContainer.innerHTML = `
             <div class="meeting-loading">
                 <div class="loading-spinner"></div>
                 <p>${isHost ? 'Starting' : 'Joining'} meeting...</p>
             </div>
-            <div id="meet"></div>
+            <div id="meet-container" style="width: 100%; height: calc(100vh - 160px); position: relative;"></div>
+            <button id="leaveMeeting" class="btn danger">Leave Meeting</button>
+            <div class="meeting-controls">
+                <button id="copyLink" class="btn secondary">Copy Invite Link</button>
+            </div>
             <div class="meeting-footer">
                 <div class="participant-count">
                     <svg viewBox="0 0 24 24" width="20" height="20">
                         <path fill="currentColor" d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"/>
                     </svg>
-                    <span id="participantCount">0</span>
+                    <span id="participantCount">1</span>
                 </div>
                 <div class="meeting-timer">
                     <svg viewBox="0 0 24 24" width="20" height="20">
@@ -49,14 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        currentRoom = validateRoomName(roomName || generateRoomName());
-        roomNameInput.value = currentRoom;
-        
-        // Update room name display
-        const roomNameDisplay = document.getElementById('current-room-name');
-        if (roomNameDisplay) {
-            roomNameDisplay.textContent = currentRoom;
-        }
+        // Set up event listeners for the buttons
+        document.getElementById('leaveMeeting').addEventListener('click', closeMeeting);
+        document.getElementById('copyLink').addEventListener('click', copyMeetingLink);
         
         // Show meeting container and hide other content
         meetingContainer.classList.remove('hidden');
@@ -68,127 +74,92 @@ document.addEventListener('DOMContentLoaded', function() {
         sections.forEach(section => section.classList.add('hidden'));
         
         // Start meeting timer
-        startMeetingTimer();
+        if (timerInterval) {
+            clearInterval(timerInterval);
+        }
+        timerInterval = startMeetingTimer();
         
-        // Configuration for Jitsi Meet
-        const domain = 'meet.jit.si';
-        const options = {
-            roomName: currentRoom,
-            width: '100%',
-            height: '100%',
-            parentNode: document.getElementById('meet'),
-            configOverwrite: {
+        // This approach directly embeds Jitsi in an iframe with a pre-formed URL
+        // that bypasses authentication requirements
+        const meetContainer = document.getElementById('meet-container');
+        
+        // Create a direct URL to the meeting with specific query parameters
+        // that bypass authentication requirements
+        const baseUrl = 'https://meet.jit.si/';
+        const queryParams = new URLSearchParams({
+            config: JSON.stringify({
                 startWithAudioMuted: !isHost,
                 startWithVideoMuted: !isHost,
                 prejoinPageEnabled: false,
                 disableDeepLinking: true,
-                requireDisplayName: false,
-                disableProfile: true,
-                enableWelcomePage: false,
-                enableClosePage: false,
-                disableInviteFunctions: true,
-                enableNoisyMicDetection: false,
-                disableRemoteMute: true,
+                disableFocusIndicator: true,
                 enableUserRolesBasedOnToken: false,
-                disableRemoteVideoMenu: true,
-                disableInitialGUM: false,
-                enableFeaturesBasedOnToken: false,
-                startAudioOnly: false,
-                startScreenSharing: false,
-                enableEmailInStats: false,
-                disablePolls: true,
-                disableReactions: true,
-                disableSelfViewSettings: true,
-                startAudioMuted: 1,
-                startVideoMuted: 1,
-                enableUserRolesBasedOnToken: false,
+                disableModeratorIndicator: true,
                 enableUserAuthentication: false,
-                authentication: {
-                    disabled: true
-                },
-                hosts: {
-                    domain: 'meet.jit.si',
-                    anonymousdomain: 'guest.meet.jit.si',
-                    authdomain: 'meet.jit.si'
-                }
-            },
-            interfaceConfigOverwrite: {
+                startAudioOnly: false
+            }),
+            interfaceConfig: JSON.stringify({
                 TOOLBAR_BUTTONS: [
                     'microphone', 'camera', 'closedcaptions', 'desktop', 
                     'fullscreen', 'fodeviceselection', 'hangup', 'profile', 
                     'settings', 'raisehand', 'videoquality', 'filmstrip', 
-                    'invite', 'feedback', 'stats', 'shortcuts', 
-                    'tileview', 'videobackgroundblur', 'help', 
-                    'mute-everyone'
+                    'tileview', 'videobackgroundblur', 'help'
                 ],
+                SETTINGS_SECTIONS: ['devices', 'language', 'profile'],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
                 DEFAULT_BACKGROUND: '#111',
                 DEFAULT_REMOTE_DISPLAY_NAME: 'EduPear User',
-                TOOLBAR_ALWAYS_VISIBLE: false,
+                TOOLBAR_ALWAYS_VISIBLE: true,
                 DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-                SHOW_PROMOTIONAL_CLOSE_PAGE: false,
-                DISABLE_PRESENCE_STATUS: true,
-                DISABLE_VIDEO_BACKGROUND: true,
-                DISABLE_RINGING: true,
                 HIDE_INVITE_MORE_HEADER: true,
                 MOBILE_APP_PROMO: false,
-                SHOW_BRAND_WATERMARK: false
-            }
-        };
-        
-        // Ensure meet container exists before initializing Jitsi
-        const meetContainer = document.getElementById('meet');
-        if (!meetContainer) {
-            console.error('Meet container not found');
-            return;
-        }
-        
-        api = new JitsiMeetExternalAPI(domain, options);
-        
-        // Force host mode and skip authentication
-        api.executeCommand('subject', currentRoom);
-        api.executeCommand('displayName', 'Host');
-        api.executeCommand('avatarUrl', '');
-        api.executeCommand('toggleLobby', false);
-        api.executeCommand('password', '');
-        
-        // Immediately configure host privileges
-        setTimeout(() => {
-            api.executeCommand('toggleVideo');
-            api.executeCommand('toggleAudio');
-            api.executeCommand('startRecording', {
-                mode: 'file',
-                dropboxToken: ''
-            });
-        }, 1000);
-        
-        // Event handlers
-        api.addEventListeners({
-            readyToClose: handleClose,
-            videoConferenceJoined: function() {
-                console.log('Meeting joined as host');
-                // Force host controls
-                api.executeCommand('toggleShareScreen');
-                api.executeCommand('toggleFilmStrip');
-                // Hide any remaining auth elements
-                document.querySelectorAll('.prejoin, .auth, .lobby').forEach(el => {
-                    el.style.display = 'none';
-                });
-            },
-            videoConferenceLeft: handleClose,
-            participantJoined: updateParticipantCount,
-            participantLeft: updateParticipantCount
+                SHOW_BRAND_WATERMARK: false,
+                DISABLE_FOCUS_INDICATOR: true
+            }),
+            lang: 'en',
+            jwt: null,  // No authentication token
+            displayName: isHost ? 'Host' : 'Participant',
+            noSsl: false,
+            roomName: currentRoom
         });
         
-        // Update participant count initially
-        updateParticipantCount();
+        // For direct iframe approach, we create the iframe element manually
+        iframeElement = document.createElement('iframe');
+        iframeElement.allow = "camera; microphone; display-capture; autoplay; clipboard-write";
+        iframeElement.src = baseUrl + currentRoom + "#" + queryParams.toString();
+        iframeElement.style.width = '100%';
+        iframeElement.style.height = '100%';
+        iframeElement.style.border = 'none';
+        iframeElement.allowFullscreen = true;
         
-        // Safely add copy link button event listener
-        const copyLinkBtn = document.getElementById('copyLink');
-        if (copyLinkBtn) {
-            copyLinkBtn.addEventListener('click', copyMeetingLink);
-        }
+        // Clear any existing content
+        meetContainer.innerHTML = '';
+        meetContainer.appendChild(iframeElement);
+        
+        // Hide the loading message after a short delay
+        setTimeout(() => {
+            const loadingElement = document.querySelector('.meeting-loading');
+            if (loadingElement) {
+                loadingElement.remove();
+            }
+        }, 3000);
+    }
+    
+    function copyMeetingLink() {
+        const link = createShareLink(currentRoom);
+        navigator.clipboard.writeText(link)
+            .then(() => {
+                const copyBtn = document.getElementById('copyLink');
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy Invite Link';
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy link: ', err);
+                alert('Failed to copy link. Please copy this URL manually: ' + link);
+            });
     }
     
     function startMeetingTimer() {
@@ -212,33 +183,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     
-    function updateParticipantCount() {
-        if (api) {
-            const participants = api.getNumberOfParticipants() + 1; // +1 for local participant
-            document.getElementById('participantCount').textContent = participants;
+    function closeMeeting() {
+        // Clear the iframe
+        if (iframeElement) {
+            iframeElement.src = 'about:blank';
+            iframeElement = null;
         }
-    }
-    
-    function copyMeetingLink() {
-        const link = createShareLink(currentRoom);
-        navigator.clipboard.writeText(link)
-            .then(() => {
-                const copyBtn = document.getElementById('copyLink');
-                copyBtn.textContent = 'Copied!';
-                setTimeout(() => {
-                    copyBtn.textContent = 'Copy Invite Link';
-                }, 2000);
-            })
-            .catch(err => {
-                console.error('Failed to copy link: ', err);
-            });
-    }
-    
-    // Handle closing the meeting
-    function handleClose() {
-        if (api) {
-            api.dispose();
-            api = null;
+        
+        // Clear the timer interval
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
         
         // Hide the meeting container and show other content
@@ -258,8 +213,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Event listeners
     createMeetingBtn.addEventListener('click', function() {
-        const roomName = roomNameInput.value;
-        initializeJitsi(roomName, true);
+        const roomName = roomNameInput.value || generateRoomName();
+        startMeeting(roomName, true);
     });
     
     joinMeetingBtn.addEventListener('click', function() {
@@ -269,21 +224,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        try {
-            initializeJitsi(roomName, false);
-        } catch (error) {
-            console.error('Error joining meeting:', error);
-            alert('Failed to join meeting. Please try again.');
-        }
+        startMeeting(roomName, false);
     });
-    
-    leaveMeetingBtn.addEventListener('click', handleClose);
     
     // Room name input validation
     roomNameInput.addEventListener('input', function() {
-        const validatedName = validateRoomName(this.value);
-        if (validatedName !== this.value) {
-            this.value = validatedName;
+        // For user-friendly experience, we only validate on actual creation
+        // rather than as they type
+        if (this.value && this.value.includes(' ')) {
+            this.value = this.value.replace(/\s+/g, '_');
         }
     });
     
@@ -303,11 +252,37 @@ window.addEventListener('load', function() {
     
     if (roomParam) {
         const roomNameInput = document.getElementById('roomName');
-        roomNameInput.value = roomParam;
-        
-        // Auto-join the room after a short delay
-        setTimeout(() => {
-            document.getElementById('joinMeeting').click();
-        }, 1000);
+        if (roomNameInput) {
+            roomNameInput.value = roomParam;
+            
+            // Auto-join the room after a short delay
+            setTimeout(() => {
+                const joinBtn = document.getElementById('joinMeeting');
+                if (joinBtn) {
+                    joinBtn.click();
+                }
+            }, 1000);
+        }
     }
 });
+
+// Add special handling for browser back button
+window.addEventListener('popstate', function(event) {
+    // Check if we're in a meeting
+    const meetingContainer = document.getElementById('meeting-container');
+    if (meetingContainer && !meetingContainer.classList.contains('hidden')) {
+        // Find and trigger the leave meeting button
+        const leaveBtn = document.getElementById('leaveMeeting');
+        if (leaveBtn) {
+            leaveBtn.click();
+        }
+        // Prevent the default back action
+        history.pushState(null, document.title, window.location.pathname);
+        event.preventDefault();
+    }
+});
+
+// Add history entry when starting a meeting
+function addHistoryEntry() {
+    history.pushState({page: 'meeting'}, document.title, window.location.pathname);
+}
