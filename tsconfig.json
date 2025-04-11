@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"module": "commonjs",
+		"downlevelIteration": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"skipLibCheck": true,
+		"isolatedModules": true,
+		"resolveJsonModule": true,
+		"lib": ["es2020", "dom"],
+		"paths": {
+			"cbor-x/index-no-eval": ["./node_modules/cbor-x"]
+		}
+	},
+	"exclude": ["node_modules", "dist", "e2e"]
+}
