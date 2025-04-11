@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ELS Dashboard</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style/main.css">
+</head>
+<body>
+    <script>
+        // Check authentication before page loads
+        const userCode = localStorage.getItem('userCode');
+        const userType = localStorage.getItem('userType');
+        if (!userCode || userType !== 'student') {
+            window.location.href = '../index.html';
+        }
+    </script>
+    <div class="home-section">
+        <div class="banner-slider">
+            <div class="slides">
+                <img src="images/home_banner.jpg" alt="Banner 1" class="slide active">
+            </div>
+           
+        </div>
+        <div class="quick-links">
+            <a href="live.html" class="quick-link live">
+                <div class="icon-box">
+                    <i class="fas fa-video"></i>
+                </div>
+            </a>
+            <a href="top10.html" class="quick-link top10">
+                <div class="icon-box">
+                    <i class="fas fa-crown"></i>
+                </div>
+            </a>
+            <a href="https://www.edupear.com/" target="_blank" class="quick-link edupear">
+                <div class="icon-box">
+                    <img src="images/home/PearBot.png" alt="EduPear" class="pear-icon">
+                </div>
+            </a>
+        </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="functions/app.js"></script>
+</body>
+</html>
