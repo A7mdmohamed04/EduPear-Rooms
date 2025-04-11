@@ -96,26 +96,53 @@ document.addEventListener('DOMContentLoaded', function() {
                 enableUserRolesBasedOnToken: false,
                 disableModeratorIndicator: true,
                 enableUserAuthentication: false,
-                startAudioOnly: false
+                startAudioOnly: false,
+                disableInviteFunctions: true,
+                disableWelcomePage: true,
+                disablePrejoinDisplayName: true,
+                disablePrejoin: true,
+                disableLobby: true,
+                disableRemoteMute: true,
+                disableMobileAppPromo: true,
+                disableDialIn: true,
+                disableDialOut: true,
+                disableCallIntegration: true,
+                disableInitialGUM: false,
+                enableFeaturesBasedOnToken: false,
+                startScreenSharing: false,
+                enableEmailInStats: false,
+                disablePolls: true,
+                disableReactions: true,
+                disableSelfViewSettings: true
             }),
             interfaceConfig: JSON.stringify({
                 TOOLBAR_BUTTONS: [
                     'microphone', 'camera', 'closedcaptions', 'desktop', 
                     'fullscreen', 'fodeviceselection', 'hangup', 'profile', 
                     'settings', 'raisehand', 'videoquality', 'filmstrip', 
-                    'tileview', 'videobackgroundblur', 'help'
+                    'invite', 'feedback', 'stats', 'shortcuts', 
+                    'tileview', 'videobackgroundblur', 'help', 
+                    'mute-everyone'
                 ],
                 SETTINGS_SECTIONS: ['devices', 'language', 'profile'],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
-                DEFAULT_BACKGROUND: '#111',
-                DEFAULT_REMOTE_DISPLAY_NAME: 'EduPear User',
+                DEFAULT_BACKGROUND: '#4CAF50',
+                DEFAULT_REMOTE_DISPLAY_NAME: 'Participant',
+                DEFAULT_LOCAL_DISPLAY_NAME: 'Me',
                 TOOLBAR_ALWAYS_VISIBLE: true,
                 DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
                 HIDE_INVITE_MORE_HEADER: true,
                 MOBILE_APP_PROMO: false,
                 SHOW_BRAND_WATERMARK: false,
-                DISABLE_FOCUS_INDICATOR: true
+                DISABLE_FOCUS_INDICATOR: true,
+                SHOW_PROMOTIONAL_CLOSE_PAGE: false,
+                DISABLE_PRESENCE_STATUS: true,
+                DISABLE_VIDEO_BACKGROUND: true,
+                DISABLE_RINGING: true,
+                DISABLE_DIAL_IN: true,
+                DISABLE_DIAL_OUT: true,
+                DISABLE_CALL_INTEGRATION: true
             }),
             lang: 'en',
             jwt: null,  // No authentication token
@@ -144,6 +171,91 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadingElement.remove();
             }
         }, 3000);
+
+        // Initialize Jitsi Meet
+        const api = new JitsiMeetExternalAPI(baseUrl, {
+            roomName: currentRoom,
+            width: '100%',
+            height: '100%',
+            parentNode: document.getElementById('meet'),
+            configOverwrite: {
+                disableDeepLinking: true,
+                disableInviteFunctions: true,
+                disableWelcomePage: true,
+                disablePrejoinDisplayName: true,
+                disablePrejoin: true,
+                disableLobby: true,
+                disableRemoteMute: true,
+                disableMobileAppPromo: true,
+                disableDialIn: true,
+                disableDialOut: true,
+                disableCallIntegration: true,
+                disableInitialGUM: false,
+                enableFeaturesBasedOnToken: false,
+                startAudioOnly: false,
+                startScreenSharing: false,
+                enableEmailInStats: false,
+                disablePolls: true,
+                disableReactions: true,
+                disableSelfViewSettings: true
+            },
+            interfaceConfigOverwrite: {
+                SHOW_PROMOTIONAL_CLOSE_PAGE: false,
+                DISABLE_PRESENCE_STATUS: true,
+                DISABLE_VIDEO_BACKGROUND: true,
+                DISABLE_RINGING: true,
+                HIDE_INVITE_MORE_HEADER: true,
+                MOBILE_APP_PROMO: false,
+                SHOW_BRAND_WATERMARK: false,
+                DISABLE_DIAL_IN: true,
+                DISABLE_DIAL_OUT: true,
+                DISABLE_CALL_INTEGRATION: true
+            }
+        });
+
+        // Force immediate meeting join
+        api.executeCommand('subject', currentRoom);
+        api.executeCommand('displayName', 'Host');
+        api.executeCommand('avatarUrl', '');
+        api.executeCommand('toggleLobby', false);
+        api.executeCommand('password', '');
+
+        // Immediately configure host privileges
+        setTimeout(() => {
+            api.executeCommand('toggleVideo');
+            api.executeCommand('toggleAudio');
+            // Hide any join options that might appear
+            document.querySelectorAll('.prejoin, .auth, .lobby, .dial-in').forEach(el => {
+                el.style.display = 'none';
+            });
+        }, 1000);
+
+        // Add this to your Jitsi initialization
+        api.executeCommand('interfaceConfig', {
+            TOOLBAR_BUTTONS: [
+                'microphone', 'camera', 'closedcaptions', 'desktop', 
+                'fullscreen', 'fodeviceselection', 'hangup', 'profile', 
+                'settings', 'raisehand', 'videoquality', 'filmstrip', 
+                'invite', 'feedback', 'stats', 'shortcuts', 
+                'tileview', 'videobackgroundblur', 'help', 
+                'mute-everyone'
+            ],
+            SHOW_JITSI_WATERMARK: false,
+            SHOW_WATERMARK_FOR_GUESTS: false,
+            SHOW_BRAND_WATERMARK: false,
+            BRAND_WATERMARK_LINK: '',
+            DEFAULT_BACKGROUND: '#4CAF50',
+            DEFAULT_REMOTE_DISPLAY_NAME: 'Participant',
+            DEFAULT_LOCAL_DISPLAY_NAME: 'Me',
+            SHOW_PROMOTIONAL_CLOSE_PAGE: false
+        });
+
+        // Set custom colors
+        api.executeCommand('setColors', {
+            activeSpeaker: '#388E3C',
+            dominantSpeaker: '#4CAF50',
+            participant: '#81C784'
+        });
     }
     
     function copyMeetingLink() {
@@ -286,3 +398,40 @@ window.addEventListener('popstate', function(event) {
 function addHistoryEntry() {
     history.pushState({page: 'meeting'}, document.title, window.location.pathname);
 }
+
+// Mobile menu toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const nav = document.querySelector('nav.desktop-nav'); // Select desktop nav
+    const navUl = document.querySelector('nav.desktop-nav ul'); // Select desktop nav ul
+    
+    // Toggle menu when button is clicked
+    mobileMenuButton.addEventListener('click', function() {
+        navUl.classList.toggle('show'); // Only toggle visibility of navUl
+
+        // Prevent scrolling when menu is open
+        if (navUl.classList.contains('show')) { // Check for 'show' class
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    });
+    
+    // Close menu when a link is clicked
+    const navLinks = document.querySelectorAll('nav.desktop-nav ul li a'); // Select desktop nav links
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            navUl.classList.remove('show'); // Just remove 'show' class
+            document.body.style.overflow = '';
+        });
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            navUl.classList.remove('show'); // Just remove 'show' class
+            document.body.style.overflow = '';
+            navUl.style.display = ''; // Ensure display is reset on desktop
+        }
+    });
+});

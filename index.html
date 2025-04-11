@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduPear Rooms - Simple Video Conferencing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EduPear X Jitsi - Simple Video Conferencing</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,19 +14,35 @@
     <meta name="jitsi-prejoin" content="disabled">
     <meta name="jitsi-host" content="auto">
     <meta name="jitsi-moderator" content="auto">
+    <meta name="jitsi-disable-deep-linking" content="true">
+    <meta name="jitsi-disable-dial-in" content="true">
+    <meta name="jitsi-disable-dial-out" content="true">
+    <meta name="jitsi-disable-call-integration" content="true">
+    <meta name="jitsi-disable-mobile-app-promo" content="true">
 </head>
 <body>
     <header>
         <div class="logo-container">
-            <svg class="logo" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
-                <path d="M30,10 Q45,5 50,20 T70,30 Q85,35 80,45 T60,50 Q45,55 40,40 T20,30 Q5,25 10,15 T30,10" fill="#4CAF50"/>
-                <circle cx="35" cy="25" r="3" fill="#fff"/>
-                <circle cx="55" cy="25" r="3" fill="#fff"/>
-                <path d="M40,35 Q45,40 50,35" stroke="#fff" stroke-width="2" fill="none"/>
-            </svg>
-            <span>EduPear Rooms</span>
+            <div class="logo-svg">
+                <svg class="logo" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M30,10 Q45,5 50,20 T70,30 Q85,35 80,45 T60,50 Q45,55 40,40 T20,30 Q5,25 10,15 T30,10" fill="#4CAF50"/>
+                    <circle cx="35" cy="25" r="3" fill="#fff"/>
+                    <circle cx="55" cy="25" r="3" fill="#fff"/>
+                    <path d="M40,35 Q45,40 50,35" stroke="#fff" stroke-width="2" fill="none"/>
+                </svg>
+            </div>
+            <div class="logo-words">
+                <span class="logo-text">
+                    <span class="edupear">EduPear</span>
+                    <span class="x"> X </span>
+                    <span class="jitsi">Jitsi</span>
+                </span>
+            </div>
         </div>
-        <nav>
+        <button class="mobile-menu-button">
+            <!-- Mobile menu text removed -->
+        </button>
+        <nav class="desktop-nav">
             <ul>
                 <li><a href="#" class="active">Home</a></li>
                 <li><a href="#features">Features</a></li>
@@ -34,13 +50,45 @@
                 <li><a href="#about">About</a></li>
             </ul>
         </nav>
+        
+        <div class="mobile-menu-overlay hidden">
+            <div class="mobile-menu-header">
+                <div class="logo-container">
+                    <svg class="logo" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M30,10 Q45,5 50,20 T70,30 Q85,35 80,45 T60,50 Q45,55 40,40 T20,30 Q5,25 10,15 T30,10" fill="#4CAF50"/>
+                        <circle cx="35" cy="25" r="3" fill="#fff"/>
+                        <circle cx="55" cy="25" r="3" fill="#fff"/>
+                        <path d="M40,35 Q45,40 50,35" stroke="#fff" stroke-width="2" fill="none"/>
+                    </svg>
+                    <span class="logo-text">
+                        <span class="edupear">EduPear</span>
+                        <span class="x"> X </span>
+                        <span class="jitsi">Jitsi</span>
+                    </span>
+                </div>
+                <button class="close-menu-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <nav class="mobile-nav">
+                <ul>
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
 
     <main>
         <section class="hero">
             <div class="hero-content">
                 <h1>Connect with Anyone, Anywhere</h1>
-                <p>Free, secure, and hassle-free video meetings with EduPear Rooms</p>
+                <p>Free, secure, and hassle-free video meetings with EduPear X Jitsi</p>
                 <div class="meeting-controls">
                     <input type="text" id="roomName" placeholder="Enter room name" class="room-input">
                     <button id="createMeeting" class="btn primary">Start Meeting</button>
@@ -63,6 +111,19 @@
 
         <section id="meeting-container" class="meeting-container hidden">
             <div class="meeting-header">
+                <div class="edupear-branding">
+                    <svg class="logo-small" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M30,10 Q45,5 50,20 T70,30 Q85,35 80,45 T60,50 Q45,55 40,40 T20,30 Q5,25 10,15 T30,10" fill="#4CAF50"/>
+                        <circle cx="35" cy="25" r="3" fill="#fff"/>
+                        <circle cx="55" cy="25" r="3" fill="#fff"/>
+                        <path d="M40,35 Q45,40 50,35" stroke="#fff" stroke-width="2" fill="none"/>
+                    </svg>
+                    <span class="logo-text">
+                        <span class="edupear">EduPear</span>
+                        <span class="x"> X </span>
+                        <span class="jitsi">Jitsi</span>
+                    </span>
+                </div>
                 <h2>Meeting: <span id="current-room-name">Room Name</span></h2>
                 <div class="meeting-actions">
                     <button id="copyLink" class="btn secondary">Copy Invite Link</button>
@@ -87,7 +148,7 @@
         </section>
 
         <section id="features" class="features">
-            <h2>Why Choose EduPear Rooms?</h2>
+            <h2>Why Choose EduPear X Jitsi?</h2>
             <div class="feature-cards">
                 <div class="feature-card">
                     <svg class="feature-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -151,9 +212,9 @@
         </section>
 
         <section id="about" class="about">
-            <h2>About EduPear Rooms</h2>
-            <p>EduPear Rooms was created to provide a simple, accessible video conferencing solution for everyone. Whether you're a teacher, student, professional, or just catching up with friends, our platform offers a seamless meeting experience without the hassle of creating accounts or downloading software.</p>
-            <p>Built with the powerful Jitsi API, EduPear Rooms brings you enterprise-grade video conferencing features completely free of charge.</p>
+            <h2>About EduPear X Jitsi</h2>
+            <p>EduPear X Jitsi was created to provide a simple, accessible video conferencing solution for everyone. Whether you're a teacher, student, professional, or just catching up with friends, our platform offers a seamless meeting experience without the hassle of creating accounts or downloading software.</p>
+            <p>Built with the powerful Jitsi API, EduPear X Jitsi brings you enterprise-grade video conferencing features completely free of charge.</p>
         </section>
     </main>
 
@@ -166,7 +227,11 @@
                     <circle cx="55" cy="25" r="3" fill="#fff"/>
                     <path d="M40,35 Q45,40 50,35" stroke="#fff" stroke-width="2" fill="none"/>
                 </svg>
-                <span>EduPear Rooms</span>
+                <span class="logo-text">
+                    <span class="edupear">EduPear</span>
+                    <span class="x"> X </span>
+                    <span class="jitsi">Jitsi</span>
+                </span>
             </div>
             <div class="footer-links">
                 <div class="footer-column">
@@ -192,11 +257,11 @@
             </div>
         </div>
         <div class="copyright">
-            <p>&copy; 2023 EduPear Rooms. All rights reserved.</p>
+            <p>&copy; 2023 EduPear X Jitsi. All rights reserved.</p>
         </div>
     </footer>
 
     <script src="script.js"></script>
 </body>
 </html>
-</qodoArtifact>
+
