@@ -99,22 +99,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 disablePolls: true,
                 disableReactions: true,
                 disableSelfViewSettings: true,
-                disableAuth: true,
+                startAudioMuted: 1,
+                startVideoMuted: 1,
                 enableUserRolesBasedOnToken: false,
                 enableUserAuthentication: false,
                 authentication: {
                     disabled: true
+                },
+                hosts: {
+                    domain: 'meet.jit.si',
+                    anonymousdomain: 'guest.meet.jit.si',
+                    authdomain: 'meet.jit.si'
                 }
             },
             interfaceConfigOverwrite: {
                 TOOLBAR_BUTTONS: [
                     'microphone', 'camera', 'closedcaptions', 'desktop', 
                     'fullscreen', 'fodeviceselection', 'hangup', 'profile', 
-                    'chat', 'recording', 'livestreaming', 'etherpad', 
-                    'sharedvideo', 'settings', 'raisehand', 'videoquality', 
-                    'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts', 
-                    'tileview', 'videobackgroundblur', 'download', 'help', 
-                    'mute-everyone', 'security'
+                    'settings', 'raisehand', 'videoquality', 'filmstrip', 
+                    'invite', 'feedback', 'stats', 'shortcuts', 
+                    'tileview', 'videobackgroundblur', 'help', 
+                    'mute-everyone'
                 ],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
@@ -141,24 +146,31 @@ document.addEventListener('DOMContentLoaded', function() {
         
         api = new JitsiMeetExternalAPI(domain, options);
         
-        // Force guest mode and skip authentication
+        // Force host mode and skip authentication
         api.executeCommand('subject', currentRoom);
-        api.executeCommand('displayName', 'Guest');
+        api.executeCommand('displayName', 'Host');
         api.executeCommand('avatarUrl', '');
         api.executeCommand('toggleLobby', false);
+        api.executeCommand('password', '');
         
-        // Immediately join the meeting
+        // Immediately configure host privileges
         setTimeout(() => {
-            api.executeCommand('password', '');
             api.executeCommand('toggleVideo');
             api.executeCommand('toggleAudio');
+            api.executeCommand('startRecording', {
+                mode: 'file',
+                dropboxToken: ''
+            });
         }, 1000);
         
         // Event handlers
         api.addEventListeners({
             readyToClose: handleClose,
             videoConferenceJoined: function() {
-                console.log('Meeting joined successfully');
+                console.log('Meeting joined as host');
+                // Force host controls
+                api.executeCommand('toggleShareScreen');
+                api.executeCommand('toggleFilmStrip');
                 // Hide any remaining auth elements
                 document.querySelectorAll('.prejoin, .auth, .lobby').forEach(el => {
                     el.style.display = 'none';

@@ -617,3 +617,28 @@ footer {
 .jitsi-header, .header, .toolbar {
     display: none !important;
 }
+
+/* Hide all host-related prompts */
+[aria-label="Waiting for host"], 
+[aria-label="You are the host"],
+[aria-label="Grant moderator"],
+[aria-label="Granted moderator"],
+[aria-label="Request moderator"],
+[aria-label="Requested moderator"],
+[aria-label="Moderator"],
+[aria-label="Host"],
+[aria-label="Lobby"],
+[aria-label="Knocking"],
+[aria-label="Knock"],
+[aria-label="Admit"],
+[aria-label="Deny"] {
+    display: none !important;
+}
+
+/* Hide any remaining host controls */
+[aria-label="Grant moderator"],
+[aria-label="Granted moderator"],
+[aria-label="Request moderator"],
+[aria-label="Requested moderator"] {
+    display: none !important;
+}
