@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Live Session</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style/start-live.css">
+</head>
+<body>
+    <div class="start-live-container">
+        <div class="start-live-card">
+            <h1><i class="fas fa-chalkboard-teacher"></i> Start Live Session</h1>
+            
+            <div class="form-group">
+                <label for="session-title">Session Title</label>
+                <input type="text" id="session-title" placeholder="Enter session title">
+            </div>
+            
+            <div class="form-group">
+                <label for="session-subject">Subject</label>
+                <select id="session-subject">
+                    <option value="math">Mathematics</option>
+                    <option value="science">Science</option>
+                    <option value="english">English</option>
+                    <option value="history">History</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="require-auth"> 
+                    Require authentication to join
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="record-session"> 
+                    Record this session
+                </label>
+            </div>
+            
+            <button id="start-session-btn" class="primary-btn">
+                <i class="fas fa-broadcast-tower"></i> Start Session
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('start-session-btn').addEventListener('click', function() {
+            const title = document.getElementById('session-title').value;
+            const subject = document.getElementById('session-subject').value;
+            const requireAuth = document.getElementById('require-auth').checked;
+            const recordSession = document.getElementById('record-session').checked;
+            
+            if (!title) {
+                alert('Please enter a session title');
+                return;
+            }
+            
+            // Generate random session code (6 characters)
+            const sessionCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            
+            // Store session info
+            localStorage.setItem('currentSession', JSON.stringify({
+                title,
+                subject,
+                code: sessionCode,
+                requireAuth,
+                recordSession,
+                isHost: true
+            }));
+            
+            // Redirect to live session
+            window.location.href = 'live.html';
+        });
+    </script>
+</body>
+</html>
