@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <path d="M30,10 Q45,5 50,20 T70,30 Q85,35 80,45 T60,50 Q45,55 40,40 T20,30 Q5,25 10,15 T30,10" fill="#4CAF50"/>
-  <circle cx="35" cy="25" r="3" fill="#fff"/>
-  <circle cx="55" cy="25" r="3" fill="#fff"/>
-  <path d="M40,35 Q45,40 50,35" stroke="#fff" stroke-width="2" fill="none"/>
-</svg>
-</qodoArtifact>
