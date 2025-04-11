@@ -98,7 +98,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 enableEmailInStats: false,
                 disablePolls: true,
                 disableReactions: true,
-                disableSelfViewSettings: true
+                disableSelfViewSettings: true,
+                disableAuth: true,
+                enableUserRolesBasedOnToken: false,
+                enableUserAuthentication: false,
+                authentication: {
+                    disabled: true
+                }
             },
             interfaceConfigOverwrite: {
                 TOOLBAR_BUTTONS: [
@@ -119,7 +125,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 SHOW_PROMOTIONAL_CLOSE_PAGE: false,
                 DISABLE_PRESENCE_STATUS: true,
                 DISABLE_VIDEO_BACKGROUND: true,
-                DISABLE_RINGING: true
+                DISABLE_RINGING: true,
+                HIDE_INVITE_MORE_HEADER: true,
+                MOBILE_APP_PROMO: false,
+                SHOW_BRAND_WATERMARK: false
             }
         };
         
@@ -132,17 +141,28 @@ document.addEventListener('DOMContentLoaded', function() {
         
         api = new JitsiMeetExternalAPI(domain, options);
         
-        // Immediately join the meeting without waiting for authentication
+        // Force guest mode and skip authentication
         api.executeCommand('subject', currentRoom);
         api.executeCommand('displayName', 'Guest');
         api.executeCommand('avatarUrl', '');
+        api.executeCommand('toggleLobby', false);
+        
+        // Immediately join the meeting
+        setTimeout(() => {
+            api.executeCommand('password', '');
+            api.executeCommand('toggleVideo');
+            api.executeCommand('toggleAudio');
+        }, 1000);
         
         // Event handlers
         api.addEventListeners({
             readyToClose: handleClose,
             videoConferenceJoined: function() {
-                // Meeting successfully joined
                 console.log('Meeting joined successfully');
+                // Hide any remaining auth elements
+                document.querySelectorAll('.prejoin, .auth, .lobby').forEach(el => {
+                    el.style.display = 'none';
+                });
             },
             videoConferenceLeft: handleClose,
             participantJoined: updateParticipantCount,

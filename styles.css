@@ -583,8 +583,21 @@ footer {
     to { transform: rotate(360deg); }
 }
 
-/* Hide authentication prompts */
-.jitsi-popup, .prejoin-container, .prejoin-input-area {
+/* Hide all authentication related elements */
+.jitsi-popup, 
+.prejoin-container, 
+.prejoin-input-area,
+.auth-container,
+[aria-label="Authentication"], 
+[data-testid="prejoin.joinMeeting"],
+[data-testid="prejoin.enterName"],
+[data-testid="prejoin.joinMeeting"],
+[aria-label="Login"],
+[aria-label="Sign in"],
+.watermark,
+#watermark,
+#new-toolbox,
+#new-toolbox-container {
     display: none !important;
 }
 
@@ -597,9 +610,10 @@ footer {
     bottom: 0;
     width: 100%;
     height: 100%;
+    border: none !important;
 }
 
-/* Hide any remaining Jitsi authentication elements */
-[aria-label="Authentication"], [data-testid="prejoin.joinMeeting"] {
+/* Hide any Jitsi header elements */
+.jitsi-header, .header, .toolbar {
     display: none !important;
 }
