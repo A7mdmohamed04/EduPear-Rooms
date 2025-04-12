@@ -1,47 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Session</title>
+    <script src='https://8x8.vc/vpaas-magic-cookie-cd5d26f56f144b1b98a592ee6ceb3299/external_api.js' async></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style/live.css">
-</head>
-<body>
-    <div class="live-container">
-        <!-- Host Section -->
-        <div class="host-section" id="host-section">
-            <h1><i class="fas fa-chalkboard-teacher"></i> Start Live Session</h1>
-            <div class="form-group">
-                <input type="text" id="room-name" placeholder="Enter room name">
-            </div>
-            <button id="start-session-btn" class="primary-btn">
-                <i class="fas fa-broadcast-tower"></i> Create Room
-            </button>
-        </div>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --primary-color: #4a90e2;
+        --secondary-color: #3a7bd5;
+        --accent-color: #e8f0fe;
+        --text-color: #333;
+        --light-text: #fff;
+        --background-color: #f9fafb;
+        --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+      }
+      
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      html, body { 
+        height: 100%; 
+        font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+      }
+      
+      body {
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+      
+      .navbar {
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        transition: all 0.4s ease;
+      }
+      
+      .navbar:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      }
 
-        <!-- Join Section -->
-        <div class="join-section" id="join-section">
-            <h1><i class="fas fa-user-graduate"></i> Join Live Session</h1>
-            <div class="form-group">
-                <input type="text" id="room-url" placeholder="Enter room name">
-            </div>
-            <button id="join-session-btn" class="primary-btn">
-                <i class="fas fa-sign-in-alt"></i> Join Room
-            </button>
-        </div>
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+      }
+      
+      .back-button {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: var(--light-text);
+        cursor: pointer;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(5px);
+      }
+      
+      .back-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateX(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      
+      .back-button i {
+        transition: transform 0.3s ease;
+      }
+      
+      .back-button:hover i {
+        transform: translateX(-3px);
+      }
+      
+      .navbar-brand {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.8rem;
+        font-weight: bold;
+        text-decoration: none;
+        position: relative;
+        padding: 0.3rem 0.5rem;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+      }
+      
+      .brand-al {
+        color: #ffcc00;
+      }
+      
+      .brand-magd {
+        color: var(--light-text);
+      }
 
-        <!-- Video Container -->
-        <div class="video-container" id="video-container" style="display: none;">
-            <div id="video-call"></div>
-            <button id="leave-btn" class="danger-btn">
-                <i class="fas fa-sign-out-alt"></i> Leave Session
-            </button>
-        </div>
+      .navbar-brand:hover {
+        transform: scale(1.05);
+      }
+
+      .navbar-brand::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--light-text);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+      }
+      
+      .navbar-brand:hover::after {
+        width: 100%;
+      }
+      
+      .welcome-banner {
+        background: linear-gradient(to right, #e8f0fe, #d2e3fc);
+        padding: 1.2rem 2rem;
+        color: var(--primary-color);
+        font-weight: 600;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        margin: 1.5rem;
+        animation: fadeIn 0.8s ease-out;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      #jaas-container {
+        flex: 1;
+        margin: 0 1.5rem 1.5rem;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: var(--transition);
+        min-height: 500px;
+      }
+      
+      .footer {
+        text-align: center;
+        padding: 1.2rem;
+        background-color: var(--accent-color);
+        color: var(--primary-color);
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+      }
+    </style>
+    <script type="text/javascript">
+      window.onload = () => {
+        const api = new JitsiMeetExternalAPI("8x8.vc", {
+          roomName: "vpaas-magic-cookie-cd5d26f56f144b1b98a592ee6ceb3299/SampleAppCognitiveFestivalsAverageAccordingly",
+          parentNode: document.querySelector('#jaas-container')
+        });
+      }
+    </script>
+    <title>AlMagd Learning Platform</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-left">
+        <span class="navbar-brand"><span class="brand-al">AL</span><span class="brand-magd">MAGD</span></span>
+      </div>
+      <div class="nav-right">
+        <a href="/" style="color: white; text-decoration: none;">
+          <i class="fas fa-home" style="font-size: 1.5rem; cursor: pointer;"></i>
+        </a>
+      </div>
+    </nav>
+    <div class="welcome-banner">
+      Welcome to your virtual classroom! Ready to learn together?
     </div>
-
-    <!-- Jitsi Meet API -->
-    <script src="https://8x8.vc/external_api.js"></script>
-    <script src="functions/live.js"></script>
-</body>
+    <div id="jaas-container"></div>
+    <div class="footer">
+      AlMagd Learning Platform © 2025 | Powered by EduPear
+    </div>
+  </body>
 </html>
