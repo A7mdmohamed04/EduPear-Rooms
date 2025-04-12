@@ -60,13 +60,6 @@
     transform: scale(1.2);
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .home-section {
-        background: #1a1d21;
-    }
-}
-
 /* Mobile responsiveness */
 @media (max-width: 768px) {
     .banner-slider {
@@ -150,13 +143,6 @@
     box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .quick-link span {
-        color: #ffffff;
-    }
-}
-
 /* Updated Mobile responsiveness */
 @media (max-width: 600px) {
     .quick-links {
@@ -234,12 +220,5 @@
     .home-images {
         padding: 5px 15px;
         gap: 15px;
-    }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .image-container {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 }
