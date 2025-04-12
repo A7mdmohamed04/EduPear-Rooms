@@ -167,120 +167,13 @@
         font-size: 0.9rem;
         border-top: 1px solid rgba(0, 0, 0, 0.05);
       }
-      
-      .permissions-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-      }
-      
-      .permissions-dialog {
-        background-color: white;
-        padding: 2rem;
-        border-radius: 12px;
-        max-width: 500px;
-        width: 90%;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      }
-      
-      .permissions-dialog h2 {
-        color: var(--primary-color);
-        margin-bottom: 1rem;
-      }
-      
-      .permissions-dialog p {
-        margin-bottom: 1.5rem;
-        line-height: 1.6;
-      }
-      
-      .permissions-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-      }
-      
-      .permissions-button {
-        padding: 0.8rem 1.5rem;
-        border-radius: 50px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: var(--transition);
-        border: none;
-      }
-      
-      .allow-button {
-        background-color: var(--primary-color);
-        color: white;
-      }
-      
-      .allow-button:hover {
-        background-color: var(--secondary-color);
-        transform: translateY(-3px);
-      }
-      
-      .deny-button {
-        background-color: #f1f1f1;
-        color: #666;
-      }
-      
-      .deny-button:hover {
-        background-color: #e0e0e0;
-      }
-      
-      .hidden {
-        display: none;
-      }
     </style>
     <script type="text/javascript">
       window.onload = () => {
-        // Show permissions dialog first
-        const permissionsOverlay = document.getElementById('permissions-overlay');
-        const allowButton = document.getElementById('allow-button');
-        const denyButton = document.getElementById('deny-button');
-        
-        allowButton.addEventListener('click', () => {
-          // Request camera and microphone permissions
-          navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-            .then(stream => {
-              // Stop the tracks to release the devices
-              stream.getTracks().forEach(track => track.stop());
-              
-              // Hide the permissions dialog
-              permissionsOverlay.classList.add('hidden');
-              
-              // Initialize Jitsi after permissions are granted
-              initializeJitsi();
-            })
-            .catch(error => {
-              console.error('Error accessing media devices:', error);
-              alert('Please allow camera and microphone access to join the virtual classroom.');
-            });
+        const api = new JitsiMeetExternalAPI("8x8.vc", {
+          roomName: "vpaas-magic-cookie-cd5d26f56f144b1b98a592ee6ceb3299/SampleAppCognitiveFestivalsAverageAccordingly",
+          parentNode: document.querySelector('#jaas-container')
         });
-        
-        denyButton.addEventListener('click', () => {
-          alert('Camera and microphone access is required to participate in the virtual classroom.');
-        });
-        
-        function initializeJitsi() {
-          const api = new JitsiMeetExternalAPI("8x8.vc", {
-            roomName: "vpaas-magic-cookie-cd5d26f56f144b1b98a592ee6ceb3299/SampleAppCognitiveFestivalsAverageAccordingly",
-            parentNode: document.querySelector('#jaas-container'),
-            userInfo: {
-              displayName: 'AlMagd Student'
-            },
-            configOverwrite: {
-              prejoinPageEnabled: false
-            }
-          });
-        }
       }
     </script>
     <title>AlMagd Learning Platform</title>
@@ -301,16 +194,6 @@
       Welcome to your virtual classroom! Ready to learn together?
     </div>
     <div id="jaas-container"></div>
-    <div id="permissions-overlay" class="permissions-overlay">
-      <div class="permissions-dialog">
-        <h2>Camera and Microphone Access</h2>
-        <p>To participate in the virtual classroom, AlMagd Learning Platform needs access to your camera and microphone. This allows you to see and hear others, and for them to see and hear you.</p>
-        <div class="permissions-buttons">
-          <button id="allow-button" class="permissions-button allow-button">Allow Access</button>
-          <button id="deny-button" class="permissions-button deny-button">Not Now</button>
-        </div>
-      </div>
-    </div>
     <div class="footer">
       AlMagd Learning Platform © 2025 | Powered by EduPear
     </div>
