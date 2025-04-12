@@ -140,6 +140,15 @@
     box-shadow: 0 8px 20px rgba(255, 193, 7, 0.4);
 }
 
+.quick-link.tools .icon-box {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.quick-link.tools:hover .icon-box {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+}
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
